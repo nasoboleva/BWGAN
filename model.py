@@ -4,6 +4,7 @@ import torch.nn as nn
 
 class Upsample(nn.Module):
     def __init__(self, scale):
+        super(Upsample, self).__init__()
         self.scale = scale
 
     def forward(self, x):
