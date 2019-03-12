@@ -54,28 +54,28 @@ class ResBlock(nn.Module):
 
 
 class Generator(nn.Module):
-    def __init__(self, noise_size=128, channels=1, img_size=28):
+    def __init__(self, noise_size=128, channels=3, img_size=32):
         super(Generator, self).__init__()
         
         self.noise_size = noise_size
         self.channels = channels
         self.img_size = img_size
-        self.linear = nn.Linear(noise_size, noise_size * (self.img_size // 4) ** 2)
+        self.linear = nn.Linear(noise_size, noise_size * (self.img_size // 8) ** 2)
         self.generator = nn.Sequential(
                                        ResBlock(sampling="upsampling", normalize=True, in_channels=noise_size, out_channels=noise_size),
                                        ResBlock(sampling="upsampling", normalize=True, in_channels=noise_size, out_channels=noise_size),
-                                       ResBlock(sampling="no", normalize=True, in_channels=noise_size, out_channels=noise_size),
+                                       ResBlock(sampling="upsampling", normalize=True, in_channels=noise_size, out_channels=noise_size),
                                        nn.Conv2d(noise_size, self.channels, kernel_size=1),
                                        nn.Tanh(),
                                        )
     
     def forward(self, x):
-        image = self.linear(x).view((-1, self.noise_size, (self.img_size // 4), (self.img_size // 4)))
+        image = self.linear(x).view((-1, self.noise_size, (self.img_size // 8), (self.img_size // 8)))
         return self.generator(image)
 
 
 class Discriminator(nn.Module):
-    def __init__(self, noise_size, channels=1):
+    def __init__(self, noise_size, channels=3):
         super(Discriminator, self).__init__()
         
         self.channels = channels
